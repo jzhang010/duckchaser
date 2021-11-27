@@ -11,6 +11,12 @@ public class DriveTrainMecanum {
     private final DcMotorEx frontRight;
     private final DcMotorEx backRight;
 
+    private static final double TICKS_PER_MOTOR_REV     = 537.7; //Yellow Jacket motor on rev 20 gear box
+    private static final double WHEEL_DIAMETER_INCHES   = 1.0;
+    public static final double TICKS_PER_INCH = TICKS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * Math.PI);
+
+    private static final int POSITIONING_TOLERANCE = 30; //The amount of ticks the DriveByInch method should be allowed to deviate by
+
     public DriveTrainMecanum(HardwareMap hardwareMap) {
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontleft");
         backLeft = hardwareMap.get(DcMotorEx.class, "backleft");
@@ -23,16 +29,11 @@ public class DriveTrainMecanum {
     }
 
     public void humanControl(Gamepad gamepad) {
-        double drive = -gamepad.left_stick_y;
+        double forward = -gamepad.left_stick_y;
         double strafe = gamepad.left_stick_x;
         double turn = gamepad.right_stick_x;
 
-        double fl = drive + strafe + turn;
-        double bl = drive - strafe + turn;
-        double fr = drive - strafe - turn;
-        double br = drive + strafe - turn;
-
-        setDrivePowers(fl, bl, br, fr);
+        drive(forward, strafe, turn);
 
     }
 
@@ -50,6 +51,29 @@ public class DriveTrainMecanum {
         backLeft.setPower(bl);
         backRight.setPower(br);
         frontRight.setPower(fr);
+    }
+
+    public void drive (double forward, double strafe, double turn)
+    {
+        double fl = forward + strafe + turn;
+        double bl = forward - strafe + turn;
+        double fr = forward - strafe - turn;
+        double br = forward + strafe - turn;
+
+        setDrivePowers(fl, bl, br, fr);
+    }
+
+    public void forwardByInch (double inches, double power)
+    {
+        int targetPos = (int)(inches * TICKS_PER_INCH);
+
+        drive(power, 0, 0);
+
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
+
+        frontLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        while (frontLeft.isBusy() ){}
+        stop();
     }
 
 }

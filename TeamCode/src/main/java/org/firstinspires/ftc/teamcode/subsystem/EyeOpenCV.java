@@ -27,12 +27,16 @@ public class EyeOpenCV {
     private int leftDuckX;
     private int centerDuckX;
     private int rightDuckX;
+    private int streamWidth;
+    private int streamHeight;
     Telemetry telemetry;
 
-    public EyeOpenCV(int leftDuckX, int centerDuckX, int rightDuckX) {
+    public EyeOpenCV(int leftDuckX, int centerDuckX, int rightDuckX, int streamWidth, int streamHeight) {
         this.leftDuckX = leftDuckX;
         this.centerDuckX = centerDuckX;
         this.rightDuckX = rightDuckX;
+        this.streamWidth = streamWidth;
+        this.streamHeight = streamHeight;
     }
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -44,7 +48,7 @@ public class EyeOpenCV {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(streamWidth, streamHeight, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -57,7 +61,7 @@ public class EyeOpenCV {
 
     public void init_loop() {
         telemetry.addData("avg", "%d %d %d", eyePipeline.avg1, eyePipeline.avg2, eyePipeline.avg3);
-        telemetry.addData("maxVal", Math.max(Math.max(eyePipeline.avg1, eyePipeline.avg2), eyePipeline.avg3));
+        telemetry.addData("minVal", Math.min(Math.min(eyePipeline.avg1, eyePipeline.avg2), eyePipeline.avg3));
     }
 
     public void stop() {
@@ -68,22 +72,18 @@ public class EyeOpenCV {
         open = false;
     }
 
-    public EyePipeline.DuckPosition getAnalysis(){
+    public enum DuckPosition {
+        LEFT,
+        CENTER,
+        RIGHT,
+        NONE
+    }
+
+    public DuckPosition getAnalysis(){
         return eyePipeline.getAnalysis();
     }
 
-    public static class EyePipeline extends OpenCvPipeline
-    {
-        /*
-         * An enum to define the skystone position
-         */
-        public enum DuckPosition
-        {
-            LEFT,
-            CENTER,
-            RIGHT
-        }
-
+    public static class EyePipeline extends OpenCvPipeline {
         /*
          * Some color constants
          */
@@ -132,7 +132,7 @@ public class EyeOpenCV {
         int avg1, avg2, avg3;
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        private volatile DuckPosition position = DuckPosition.LEFT;
+        private volatile DuckPosition position = DuckPosition.NONE;
 
         public EyePipeline(int leftDuckX, int centerDuckX, int rightDuckX) {
             /*
@@ -144,23 +144,6 @@ public class EyeOpenCV {
             REGION_WIDTH = 40;
             REGION_HEIGHT = 40;
 
-            /*
-             * Points which actually define the sample region rectangles, derived from above values
-             *
-             * Example of how points A and B work to define a rectangle
-             *
-             *   ------------------------------------
-             *   | (0,0) Point A                    |
-             *   |                                  |
-             *   |                                  |
-             *   |                                  |
-             *   |                                  |
-             *   |                                  |
-             *   |                                  |
-             *   |                  Point B (70,50) |
-             *   ------------------------------------
-             *
-             */
             region1_pointA = new Point(
                     REGION1_TOPLEFT_ANCHOR_POINT.x,
                     REGION1_TOPLEFT_ANCHOR_POINT.y);
@@ -312,7 +295,11 @@ public class EyeOpenCV {
              * Now that we found the max, we actually need to go and
              * figure out which sample region that value was from
              */
-            if(min == avg1) // Was it from region 1?
+            if (min >= 100 )
+            {
+                position = DuckPosition.NONE;
+            }
+            else if(min == avg1) // Was it from region 1?
             {
                 position = DuckPosition.LEFT; // Record our analysis
 

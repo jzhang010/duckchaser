@@ -15,13 +15,14 @@ public class AutoActions extends OpMode
     private org.firstinspires.ftc.teamcode.subsystem.Waver waver;
     private org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV eye;
     private int pos;
+    private boolean start = false;
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
         drive = new org.firstinspires.ftc.teamcode.subsystem.DriveTrainMecanum(hardwareMap);
         waver = new org.firstinspires.ftc.teamcode.subsystem.Waver(hardwareMap);
-        eye = new org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV(0, 105, 205);
+        eye = new org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV(0, 140, 280, 320, 240);
         eye.init(hardwareMap, telemetry);
     }
 
@@ -30,18 +31,23 @@ public class AutoActions extends OpMode
      */
     @Override
     public void init_loop() {
-        if (eye.getAnalysis() == org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV.EyePipeline.DuckPosition.RIGHT) {
+        start = false;
+        if (eye.getAnalysis() == org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV.DuckPosition.RIGHT) {
             waver.right();
             pos = 1;
         }
-        else if (eye.getAnalysis() == org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV.EyePipeline.DuckPosition.LEFT) {
+        else if (eye.getAnalysis() == org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV.DuckPosition.LEFT) {
             waver.left();
             pos = -1;
         }
-        else {
+        else if (eye.getAnalysis() == org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV.DuckPosition.CENTER) {
             waver.center();
             pos = 0;
         }
+        else {
+            // do nothing
+        }
+        eye.init_loop();
     }
 
     /*
@@ -60,6 +66,11 @@ public class AutoActions extends OpMode
         // Setup a variable for each drive wheel to save power level for telemetry
         drive.humanControl(gamepad1);
 
+        if (!start)
+        {
+            drive.forwardByInch(5, .5);
+            start = true;
+        }
         // Show the elapsed game time and wheel power.
         telemetry.addData("Motors", "frontleft (%.2f)", drive.getFL());
         telemetry.addData("Motors", "backleft (%.2f)", drive.getBL());
