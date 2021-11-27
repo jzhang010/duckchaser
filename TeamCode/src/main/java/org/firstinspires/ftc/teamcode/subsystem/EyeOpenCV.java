@@ -175,8 +175,7 @@ public class EyeOpenCV {
         }
 
         @Override
-        public void init(Mat firstFrame)
-        {
+        public void init(Mat firstFrame) {
             /*
              * We need to call this in order to make sure the 'Cb'
              * object is initialized, so that the submats we make
@@ -199,8 +198,7 @@ public class EyeOpenCV {
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             /*
              * Overview of what we're doing:
              *
@@ -285,22 +283,17 @@ public class EyeOpenCV {
                     BLUE, // The color the rectangle is drawn in
                     2); // Thickness of the rectangle lines
 
-
-            /*
-             * Find the max of the 3 averages
-             */
+            // Find the min of the 3 averages
             int min = Math.min(Math.min(avg1, avg2), avg3);
 
             /*
              * Now that we found the max, we actually need to go and
              * figure out which sample region that value was from
              */
-            if (min >= 100 )
-            {
+            if (min >= 100 ) {
                 position = DuckPosition.NONE;
             }
-            else if(min == avg1) // Was it from region 1?
-            {
+            else if (min == avg1) { // Was it from region 1?
                 position = DuckPosition.LEFT; // Record our analysis
 
                 /*
@@ -314,8 +307,7 @@ public class EyeOpenCV {
                         min < 100 ? GREEN : RED, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
             }
-            else if(min == avg2) // Was it from region 2?
-            {
+            else if (min == avg2) { // Was it from region 2?
                 position = DuckPosition.CENTER; // Record our analysis
 
                 /*
@@ -329,8 +321,7 @@ public class EyeOpenCV {
                         min < 100 ? GREEN : RED, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
             }
-            else if(min == avg3) // Was it from region 3?
-            {
+            else if (min == avg3) { // Was it from region 3?
                 position = DuckPosition.RIGHT; // Record our analysis
 
                 /*

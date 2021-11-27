@@ -66,8 +66,7 @@ public class AutoActions extends OpMode
         // Setup a variable for each drive wheel to save power level for telemetry
         drive.humanControl(gamepad1);
 
-        if (!start)
-        {
+        if (!start) {
             drive.forwardByInch(5, .5);
             start = true;
         }
