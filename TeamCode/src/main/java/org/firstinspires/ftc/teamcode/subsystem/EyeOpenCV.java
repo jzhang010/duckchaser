@@ -290,7 +290,7 @@ public class EyeOpenCV {
              * Now that we found the max, we actually need to go and
              * figure out which sample region that value was from
              */
-            if (min >= 100 ) {
+            if (min >= 110 ) {
                 position = DuckPosition.NONE;
             }
             else if (min == avg1) { // Was it from region 1?

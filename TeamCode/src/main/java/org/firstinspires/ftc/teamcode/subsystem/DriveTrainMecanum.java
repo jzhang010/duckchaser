@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class DriveTrainMecanum {
     private final DcMotorEx frontLeft;
@@ -16,8 +20,10 @@ public class DriveTrainMecanum {
     public static final double TICKS_PER_INCH = TICKS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     private static final int POSITIONING_TOLERANCE = 30; //The amount of ticks the DriveByInch method should be allowed to deviate by
+    private Telemetry telemetry;
+    private ElapsedTime runtime;
 
-    public DriveTrainMecanum(HardwareMap hardwareMap) {
+    public DriveTrainMecanum(HardwareMap hardwareMap, Telemetry telemetry) {
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontleft");
         backLeft = hardwareMap.get(DcMotorEx.class, "backleft");
         backRight = hardwareMap.get(DcMotorEx.class, "backright");
@@ -25,7 +31,14 @@ public class DriveTrainMecanum {
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        this.telemetry = telemetry;
+        runtime = new ElapsedTime();
+    }
+
+    public void autoInit() {
+        resetMode();
     }
 
     public void humanControl(Gamepad gamepad) {
@@ -67,38 +80,63 @@ public class DriveTrainMecanum {
     {
         int targetPos = (int)(inches * TICKS_PER_INCH);
 
-        drive(power, 0, 0);
+        setDrivePowers(power, power, power, power);
 
         frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
-        frontRight.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
-        backLeft.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
-        backRight.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
+        frontRight.setTargetPosition(frontRight.getCurrentPosition() + targetPos);
+        backLeft.setTargetPosition(backLeft.getCurrentPosition() + targetPos);
+        backRight.setTargetPosition(backRight.getCurrentPosition() + targetPos);
 
-        frontLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy()){}
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy()){
+            positionReport();
+        }
         stop();
+        //resetMode();
     }
 
     public void strafeByInch (double inches, double power){
         final int targetPos = (int)(inches * TICKS_PER_INCH);
-        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
-        frontRight.setTargetPosition(frontRight.getCurrentPosition() - targetPos);
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() - targetPos);
+        frontRight.setTargetPosition(frontRight.getCurrentPosition() + targetPos);
         backLeft.setTargetPosition(backLeft.getCurrentPosition() + targetPos);
-        backRight.setTargetPosition(backRight.getCurrentPosition());
+        backRight.setTargetPosition(backRight.getCurrentPosition() - targetPos);
 
-        frontLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        setDrivePowers(power, power, power, power);
 
-        drive(0, power, 0);
+        setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy()){}
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy()){
+            positionReport();
+        }
         stop();
+        //resetMode();
     }
 
+    public void positionReport() {
+        telemetry.addData("frontleft ", "%d %d", frontLeft.getTargetPosition(), frontLeft.getCurrentPosition());
+        telemetry.addData("frontright ", "%d %d", frontRight.getTargetPosition(), frontRight.getCurrentPosition());
+        telemetry.addData("backleft ", "%d %d", backLeft.getTargetPosition(), backLeft.getCurrentPosition());
+        telemetry.addData("backright ", "%d %d", backRight.getTargetPosition(), backRight.getCurrentPosition());
+        telemetry.update();
+    }
+
+    public void setMode(DcMotorEx.RunMode runMode) {
+        frontLeft.setMode(runMode);
+        frontRight.setMode(runMode);
+        backLeft.setMode(runMode);
+        backRight.setMode(runMode);
+    }
+
+    public void sleep(int second) {
+        runtime.reset();
+        while (runtime.seconds() < second) {}
+    }
+
+    public void resetMode() {
+        setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        positionReport();
+    }
 }

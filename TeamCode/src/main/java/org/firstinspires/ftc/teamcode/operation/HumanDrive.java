@@ -14,7 +14,7 @@ public class HumanDrive extends OpMode
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
-        drive = new DriveTrainMecanum(hardwareMap);
+        drive = new DriveTrainMecanum(hardwareMap, telemetry);
 
     }
 

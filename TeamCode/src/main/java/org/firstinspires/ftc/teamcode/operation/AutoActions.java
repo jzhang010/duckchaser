@@ -20,7 +20,7 @@ public class AutoActions extends OpMode
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
-        drive = new org.firstinspires.ftc.teamcode.subsystem.DriveTrainMecanum(hardwareMap);
+        drive = new org.firstinspires.ftc.teamcode.subsystem.DriveTrainMecanum(hardwareMap, telemetry);
         waver = new org.firstinspires.ftc.teamcode.subsystem.Waver(hardwareMap);
         eye = new org.firstinspires.ftc.teamcode.subsystem.EyeOpenCV(0, 140, 280, 320, 240);
         eye.init(hardwareMap, telemetry);

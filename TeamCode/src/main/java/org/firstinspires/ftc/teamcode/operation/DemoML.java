@@ -18,7 +18,7 @@ public class DemoML extends OpMode
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
-        drive = new DriveTrainMecanum(hardwareMap);
+        drive = new DriveTrainMecanum(hardwareMap, telemetry);
         waver = new Waver(hardwareMap);
         eye = new EyeTensorFlow(hardwareMap, telemetry);
         eye.init();
