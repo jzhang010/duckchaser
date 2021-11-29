@@ -12,14 +12,14 @@ public class Waver {
     }
 
     public void center() {
-        waver.setPosition(0.5);
+        waver.setPosition(0.65);
     }
 
     public void left() {
-        waver.setPosition(0);
+        waver.setPosition(0.52);
     }
 
     public void right() {
-        waver.setPosition(1.0);
+        waver.setPosition(0.76);
     }
 }
