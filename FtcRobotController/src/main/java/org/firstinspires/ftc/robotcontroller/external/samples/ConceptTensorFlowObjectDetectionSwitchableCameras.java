@@ -127,7 +127,7 @@ public class ConceptTensorFlowObjectDetectionSwitchableCameras extends LinearOpM
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(2.5, 16.0/9.0);
+            tfod.setZoom(1.0, 16.0/6.0);
         }
 
         /** Wait for the game to begin */
@@ -168,10 +168,7 @@ public class ConceptTensorFlowObjectDetectionSwitchableCameras extends LinearOpM
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
 
-        // Indicate that we wish to be able to switch cameras.
         webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
-        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
-        parameters.cameraName = ClassFactory.getInstance().getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -179,6 +176,7 @@ public class ConceptTensorFlowObjectDetectionSwitchableCameras extends LinearOpM
         // Set the active camera to Webcam 1.
         switchableCamera = (SwitchableCamera) vuforia.getCamera();
         switchableCamera.setActiveCamera(webcam1);
+        VuforiaLocalizer.Parameters.CameraMonitorFeedback = AXES;
 
         // Loading trackables is not necessary for the TensorFlow Object Detection engine.
     }
@@ -190,32 +188,9 @@ public class ConceptTensorFlowObjectDetectionSwitchableCameras extends LinearOpM
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.minResultConfidence = 0.9f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
-
-    private void doCameraSwitching() {
-        // If the left bumper is pressed, use Webcam 1.
-        // If the right bumper is pressed, use Webcam 2.
-        boolean newLeftBumper = gamepad1.left_bumper;
-        boolean newRightBumper = gamepad1.right_bumper;
-        if (newLeftBumper && !oldLeftBumper) {
-            switchableCamera.setActiveCamera(webcam1);
-        } else if (newRightBumper && !oldRightBumper) {
-            switchableCamera.setActiveCamera(webcam2);
-        }
-        oldLeftBumper = newLeftBumper;
-        oldRightBumper = newRightBumper;
-
-        if (switchableCamera.getActiveCamera().equals(webcam1)) {
-            telemetry.addData("activeCamera", "Webcam 1");
-            telemetry.addData("Press RightBumper", "to switch to Webcam 2");
-        } else {
-            telemetry.addData("activeCamera", "Webcam 2");
-            telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
-        }
-    }
-}
