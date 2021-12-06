@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -10,35 +9,45 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class DriveTrainMecanum {
+    // Defines 4 motors that make up the mecanum drive train
     private final DcMotorEx frontLeft;
     private final DcMotorEx backLeft;
     private final DcMotorEx frontRight;
     private final DcMotorEx backRight;
 
-    private static final double TICKS_PER_MOTOR_REV     = 537.7; //Yellow Jacket motor on rev 320 gear box
-    private static final double WHEEL_DIAMETER_INCHES   = 1.8898*2;
+    // Calculates ticks per inch basic on robot constants
+    private static final double TICKS_PER_MOTOR_REV = 537.7;
+    private static final double WHEEL_DIAMETER_INCHES = 4;
     public static final double TICKS_PER_INCH = TICKS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * Math.PI);
 
-    private static final int POSITIONING_TOLERANCE = 30; //The amount of ticks the DriveByInch method should be allowed to deviate by
+    // The amount of ticks the autonomous driving methods are allowed to deviate by
+    private static final int POSITIONING_TOLERANCE = 10;
+
+    // Defines a telemetry object for logging and an runtime object to keep track of time
     private Telemetry telemetry;
     private ElapsedTime runtime;
 
-    public DriveTrainMecanum(HardwareMap hardwareMap, Telemetry telemetry) {
+    public DriveTrainMecanum(HardwareMap hardwareMap, Telemetry telemetry)
+    {
+        // Initializes motors based on where there are in the hardware map
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontleft");
         backLeft = hardwareMap.get(DcMotorEx.class, "backleft");
         backRight = hardwareMap.get(DcMotorEx.class, "backright");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontright");
 
+        // Reverse the left side motors
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        //frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        // Sets all of the motors to have the positioning tolerance defined above
+        frontLeft.setTargetPositionTolerance(POSITIONING_TOLERANCE);
+        frontRight.setTargetPositionTolerance(POSITIONING_TOLERANCE);
+        backLeft.setTargetPositionTolerance(POSITIONING_TOLERANCE);
+        backRight.setTargetPositionTolerance(POSITIONING_TOLERANCE);
+
+        // Initializes the telemetry and runtime object
         this.telemetry = telemetry;
         runtime = new ElapsedTime();
-    }
-
-    public void autoInit() {
-        resetMode();
     }
 
     public void humanControl(Gamepad gamepad) {
@@ -47,7 +56,6 @@ public class DriveTrainMecanum {
         double turn = gamepad.right_stick_x;
 
         drive(forward, strafe, turn);
-
     }
 
     public double getFL() {return frontLeft.getPower();}
@@ -93,7 +101,6 @@ public class DriveTrainMecanum {
             positionReport();
         }
         stop();
-        //resetMode();
     }
 
     public void strafeByInch (double inches, double power){
@@ -111,7 +118,6 @@ public class DriveTrainMecanum {
             positionReport();
         }
         stop();
-        //resetMode();
     }
 
     public void positionReport() {
@@ -134,9 +140,11 @@ public class DriveTrainMecanum {
         while (runtime.seconds() < second) {}
     }
 
-    public void resetMode() {
+    public void autoInit() {
         setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         positionReport();
     }
+
+
 }

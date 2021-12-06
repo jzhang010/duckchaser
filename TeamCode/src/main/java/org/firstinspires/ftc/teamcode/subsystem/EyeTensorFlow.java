@@ -75,7 +75,7 @@ public class EyeTensorFlow {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(2.5, 16.0/9.0);
+            tfod.setZoom(1, 16.0/12.0);
         }
 
         label = "";
@@ -90,25 +90,44 @@ public class EyeTensorFlow {
             // the last time that call was made.
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-               telemetry.addData("# Object Detected", updatedRecognitions.size());
-               // step through the list of recognitions and display boundary info.
-               int i = 0;
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                // step through the list of recognitions and display boundary info.
+                int i = 0;
 
-               for (Recognition recognition : updatedRecognitions) {
-                   label = recognition.getLabel();
-                  telemetry.addData(String.format("label (%d)", i), label );
-                  telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                          recognition.getLeft(), recognition.getTop());
-                  telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                          recognition.getRight(), recognition.getBottom());
-                  i++;
-               }
-               telemetry.update();
+                for (Recognition recognition : updatedRecognitions) {
+                    label = recognition.getLabel();
+                    telemetry.addData(String.format("label (%d)", i), label );
+                    telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                            recognition.getLeft(), recognition.getTop());
+                    telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                            recognition.getRight(), recognition.getBottom());
+                    i++;
+                }
+                telemetry.update();
             }
         }
     }
 
-    public String getLabel() { return label; }
+    public int getPos()
+    {
+        int pos = -1;
+
+        List<Recognition> recognitions = tfod.getRecognitions();
+        for (Recognition recognition : recognitions)
+        {
+            double duckCenter = (recognition.getLeft() + recognition.getRight()) / 2;
+            if (duckCenter < 640/3)
+            {
+                return 0;
+            }
+            if (duckCenter < 640*2/3)
+            {
+                return 1;
+            }
+            return 2;
+        }
+        return pos;
+    }
     /**
      * Initialize the Vuforia localization engine.
      */
@@ -136,7 +155,6 @@ public class EyeTensorFlow {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.8f;
         tfodParameters.isModelTensorFlow2 = true;
-        //tfodParameters.inputSize = 320;
         tfodParameters.inputSize = 420;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);

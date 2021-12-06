@@ -15,8 +15,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-// Use Open CV  to find the duck
-// library used is from https://github.com/OpenFTC/EasyOpenCV. Follow the instruction to install
+// Use Open CV to find the duck
+// Library used is from https://github.com/OpenFTC/EasyOpenCV
 public class EyeOpenCV {
     protected OpenCvCamera camera;
 
@@ -84,9 +84,7 @@ public class EyeOpenCV {
     }
 
     public static class EyePipeline extends OpenCvPipeline {
-        /*
-         * Some color constants
-         */
+        // Color constants
         static final Scalar RED = new Scalar(255,0,0);
         static final Scalar BLUE = new Scalar(0, 0, 255);
         static final Scalar GREEN = new Scalar(0, 255, 0);

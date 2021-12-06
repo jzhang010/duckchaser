@@ -4,32 +4,21 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystem.DriveTrainMecanum;
+import org.firstinspires.ftc.teamcode.subsystem.Waver;
 
-@TeleOp(name="Huamn Drive", group="operation")
-//@Disabled
+@TeleOp(name="Human Drive", group="operation")
 public class HumanDrive extends OpMode
 {
     DriveTrainMecanum drive;
+    Waver waver;
+    boolean waving = false;
+    boolean prev = false;
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
         drive = new DriveTrainMecanum(hardwareMap, telemetry);
-
-    }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
-    @Override
-    public void init_loop() {
-    }
-
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
-    @Override
-    public void start() {
+        waver = new Waver(hardwareMap);
 
     }
 
@@ -38,7 +27,7 @@ public class HumanDrive extends OpMode
      */
     @Override
     public void loop() {
-        // Setup a variable for each drive wheel to save power level for telemetry
+        // drives the robot using gamepad inputs
         drive.humanControl(gamepad1);
 
         // Show the elapsed game time and wheel power.
@@ -46,13 +35,29 @@ public class HumanDrive extends OpMode
         telemetry.addData("Motors", "backleft (%.2f)", drive.getBL());
         telemetry.addData("Motors", "frontright (%.2f)", drive.getFR());
         telemetry.addData("Motors", "backright (%.2f)", drive.getBR());
-    }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
+        //waves the tail
+        if (gamepad1.a && !prev)
+        {
+            if (!waving)
+            {
+                waving = true;
+            }
+            else
+            {
+                waving = false;
+            }
+        }
+        prev = gamepad1.a;
+
+        if (waving)
+        {
+            waver.wave();
+        }
+        else
+        {
+            waver.center();
+        }
     }
 
 }

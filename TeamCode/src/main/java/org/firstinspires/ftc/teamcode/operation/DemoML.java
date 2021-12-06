@@ -5,14 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystem.*;
 
-@TeleOp(name="Demo ML", group="operation")
+@TeleOp(name="Duck Following", group="operation")
 //@Disabled
 public class DemoML extends OpMode
 {
     private DriveTrainMecanum drive;
     private Waver waver;
     private EyeTensorFlow eye;
-    private int pos;
     private boolean start = false;
 
     @Override
@@ -45,15 +44,17 @@ public class DemoML extends OpMode
      */
     @Override
     public void loop() {
-        // Setup a variable for each drive wheel to save power level for telemetry
-        drive.humanControl(gamepad1);
-
-
-        // Show the elapsed game time and wheel power.
-        telemetry.addData("Motors", "frontleft (%.2f)", drive.getFL());
-        telemetry.addData("Motors", "backleft (%.2f)", drive.getBL());
-        telemetry.addData("Motors", "frontright (%.2f)", drive.getFR());
-        telemetry.addData("Motors", "backright (%.2f)", drive.getBR());
+        if (gamepad1.a) {
+            if (eye.getPos() == 0) {
+                drive.drive(.2, 0, .3);
+            } else if (eye.getPos() == 1) {
+                drive.drive(.2, 0, 0);
+            } else if (eye.getPos() == 2) {
+                drive.drive(.2, 0, -.3);
+            } else {
+                drive.stop();
+            }
+        }
     }
 
     /*
