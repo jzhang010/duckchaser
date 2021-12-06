@@ -15,8 +15,10 @@ public class EyeTensorFlow {
     /*  Two additional model assets are available which only contain a subset of the objects:
      *  FreightFrenzy_DM.tflite  0: Duck,  1: Marker
      */
-    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
+    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
     public static final String[] LABELS = {
+            "Ball"
+            "Cube"
             "Duck",
             "Marker"
     };
@@ -124,7 +126,10 @@ public class EyeTensorFlow {
             {
                 return 1;
             }
-            return 2;
+            if (duckCenter < 640)
+            {
+                return 2;
+            }
         }
         return pos;
     }
@@ -153,7 +158,7 @@ public class EyeTensorFlow {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.minResultConfidence = 0.9f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 420;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
