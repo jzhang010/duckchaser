@@ -1,5 +1,5 @@
-# User Manual 
-**The User Manual is best viewed on https://github.com/jzhang010/duckchaser/edit/cs50-final-project/README.md for picture instructions 
+# User Manual
+**The User Manual is best viewed on https://github.com/jzhang010/duckchaser/edit/cs50-final-project/README.md for picture instruction
 This robot project uses computer vision to recognize location of objects, which informs autonomous robot decisions. The project struture borrows heavily from the FTC library for the robot project structure, and all of our original code can be found by going to duckchaser/TeamCode/src/main/java/org/firstinspires/ftc/teamcode. 
 
 ## Software Setup 
