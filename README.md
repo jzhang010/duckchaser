@@ -73,5 +73,5 @@ Once you have placed the duck in one of the three possible regions that the robo
 
 ## Project Video
 See our robot in action! 
-https://www.youtube.com/watch?v=CKBic0N2UCI 
+https://www.youtube.com/watch?v=M0E-NeL26WA
 
