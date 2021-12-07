@@ -70,4 +70,3 @@ Once you have placed the duck in one of the three possible regions that the robo
 
 
 
-
