@@ -1,3 +1,8 @@
+/*
+ * This class defines a mecanum drivetrain subsystem, which is used to drive the robot both
+ * autonomously and with human input.
+ */
+
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -50,6 +55,7 @@ public class DriveTrainMecanum {
         runtime = new ElapsedTime();
     }
 
+    // Takes gamepad input and drives the robot accordingly
     public void humanControl(Gamepad gamepad) {
         double forward = -gamepad.left_stick_y;
         double strafe = gamepad.left_stick_x;
@@ -58,22 +64,47 @@ public class DriveTrainMecanum {
         drive(forward, strafe, turn);
     }
 
-    public double getFL() {return frontLeft.getPower();}
-    public double getBL() {return backLeft.getPower();}
-    public double getFR() {return frontRight.getPower();}
-    public double getBR() {return backRight.getPower();}
-
-    public void stop() {
-        setDrivePowers(0.0, 0.0, 0.0, 0.0);
+    // Returns the current power of the front left motor
+    public double getFL()
+    {
+        return frontLeft.getPower();
     }
 
-    public void setDrivePowers(double fl, double bl, double br, double fr) {
+    // Returns the current power of the back left motor
+    public double getBL()
+    {
+        return backLeft.getPower();
+    }
+
+    // Returns the current power of the front right motor
+    public double getFR()
+    {
+        return frontRight.getPower();
+    }
+
+    // Returns the current power of the back right motor
+    public double getBR()
+    {
+        return backRight.getPower();
+    }
+
+    // Sets the power of the motors according to the parameters passed to the method
+    public void setDrivePowers(double fl, double bl, double br, double fr)
+    {
         frontLeft.setPower(fl);
         backLeft.setPower(bl);
         backRight.setPower(br);
         frontRight.setPower(fr);
     }
 
+    // Stops the drivetrain by setting all motor powers to 0
+    public void stop()
+    {
+        setDrivePowers(0.0, 0.0, 0.0, 0.0);
+    }
+
+    // Drives the drivetrain according to according to mecanum drive math
+    // https://gm0.org/en/latest/docs/software/mecanum-drive.html
     public void drive (double forward, double strafe, double turn)
     {
         double fl = forward + strafe + turn;
@@ -84,43 +115,66 @@ public class DriveTrainMecanum {
         setDrivePowers(fl, bl, br, fr);
     }
 
+    // Drives the robot forward by a certain number of inches and at a certain power
     public void forwardByInch (double inches, double power)
     {
+        // Calculates the target distance according to robot constants
         int targetPos = (int)(inches * TICKS_PER_INCH);
 
-        setDrivePowers(power, power, power, power);
-
+        // Sets the target position of all motors to be the current position of the motor plus the target distance
         frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + targetPos);
         frontRight.setTargetPosition(frontRight.getCurrentPosition() + targetPos);
         backLeft.setTargetPosition(backLeft.getCurrentPosition() + targetPos);
         backRight.setTargetPosition(backRight.getCurrentPosition() + targetPos);
 
+        // Sets all the motor powers to be what was passed as a parameter
+        setDrivePowers(power, power, power, power);
+
+        // Uses a PID control mode to to run all motors to their target position
         setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy()){
+        // Logs the current position of each motor while the motors are moving toward their target position
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy())
+        {
             positionReport();
         }
+
+        // Stops the drivetrain
         stop();
     }
 
-    public void strafeByInch (double inches, double power){
+    // Strafes the robot sideways by a certain number of inches and at a certain power
+    // Negative distance - strafes right, positive distance - strafes left
+    public void strafeByInch (double inches, double power)
+    {
+        // Calculates the target distance according to robot constants
         final int targetPos = (int)(inches * TICKS_PER_INCH);
+
+        // Sets the target position of all motors according to their current position and the target distance
         frontLeft.setTargetPosition(frontLeft.getCurrentPosition() - targetPos);
         frontRight.setTargetPosition(frontRight.getCurrentPosition() + targetPos);
         backLeft.setTargetPosition(backLeft.getCurrentPosition() + targetPos);
         backRight.setTargetPosition(backRight.getCurrentPosition() - targetPos);
 
+        // Sets all the motor powers to be what was passed as a parameter
         setDrivePowers(power, power, power, power);
 
+        // Uses a PID control mode to to run all motors to their target position
         setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy()){
+        // Logs the current position of each motor while the motors are moving toward their target position
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backLeft.isBusy())
+        {
             positionReport();
         }
+
+        // Stops the drivetrain
         stop();
     }
 
-    public void positionReport() {
+    // Logs the current position of each motor
+    public void positionReport()
+    {
         telemetry.addData("frontleft ", "%d %d", frontLeft.getTargetPosition(), frontLeft.getCurrentPosition());
         telemetry.addData("frontright ", "%d %d", frontRight.getTargetPosition(), frontRight.getCurrentPosition());
         telemetry.addData("backleft ", "%d %d", backLeft.getTargetPosition(), backLeft.getCurrentPosition());
@@ -128,23 +182,27 @@ public class DriveTrainMecanum {
         telemetry.update();
     }
 
-    public void setMode(DcMotorEx.RunMode runMode) {
+    // Sets the mode of each motor to what was passed as a parameter
+    public void setMode(DcMotorEx.RunMode runMode)
+    {
         frontLeft.setMode(runMode);
         frontRight.setMode(runMode);
         backLeft.setMode(runMode);
         backRight.setMode(runMode);
     }
 
-    public void sleep(int second) {
+    // Maintains the current drivetrain state for a certain nunmber of seconds
+    public void sleep(int second)
+    {
         runtime.reset();
         while (runtime.seconds() < second) {}
     }
 
-    public void autoInit() {
+    // Initializes the robot for autonomous driving, resetting the encoders upon initialization and setting all motors to equal
+    public void autoInit()
+    {
         setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         positionReport();
     }
-
-
 }
