@@ -1,3 +1,6 @@
+/*
+ * This class is a program that allows a human to drive the robot using a gamepad
+ */
 package org.firstinspires.ftc.teamcode.operation;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -11,23 +14,22 @@ public class HumanDrive extends OpMode
 {
     DriveTrainMecanum drive;
     Waver waver;
-    boolean waving = false;
-    boolean prev = false;
 
+    // Code that runs with the driver hits INIT
     @Override
-    public void init() {
+    public void init()
+    {
         telemetry.addData("Status", "Initialized");
         drive = new DriveTrainMecanum(hardwareMap, telemetry);
         waver = new Waver(hardwareMap);
 
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
+    // Code that runs repeatedly after the driver hits PLAY but before they hit STOP
     @Override
-    public void loop() {
-        // drives the robot using gamepad inputs
+    public void loop()
+    {
+        // Drives the robot using gamepad inputs
         drive.humanControl(gamepad1);
 
         // Show the elapsed game time and wheel power.
@@ -36,25 +38,16 @@ public class HumanDrive extends OpMode
         telemetry.addData("Motors", "frontright (%.2f)", drive.getFR());
         telemetry.addData("Motors", "backright (%.2f)", drive.getBR());
 
-        //waves the tail
-        if (gamepad1.a && !prev)
+        // Waves the tail left, right, or center depending on gamepad inputs
+        if (gamepad1.x)
         {
-            if (!waving)
-            {
-                waving = true;
-            }
-            else
-            {
-                waving = false;
-            }
+            waver.left();
         }
-        prev = gamepad1.a;
-
-        if (waving)
+        else if (gamepad1.b)
         {
-            waver.wave();
+            waver.right();
         }
-        else
+        else if (gamepad1.a)
         {
             waver.center();
         }
