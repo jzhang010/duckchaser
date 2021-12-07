@@ -7,7 +7,7 @@ This robot project uses computer vision to recognize location of objects, which 
 1. Download Android Studio (https://developer.android.com/studio)
 2. Click on "Android Studio" on the top tool bar and go to Preferences->Appearance and Behavior->System Settings->Android SDK and make sure that Android 8.0-10.0 are all checked under SDK platforms. Apply any changes if necessary. <img width="981" alt="Screen Shot 2021-12-07 at 12 14 05 PM" src="https://user-images.githubusercontent.com/29489739/145075476-fdac9d9c-af0c-402d-94d9-f3f67dad6e59.png">
 3. Click on "File" on the top tool bar and select "Open...". Navigate to the duckchaser project and select the entire folder to be opened in Android Studio. 
-<img width="837" alt="Screen Shot 2021-12-07 at 12 18 15 PM" src="https://user-images.githubusercontent.com/29489739/145076277-672544d0-9a27-4c22-a907-309441255790.png">
+<img width="833" alt="Screen Shot 2021-12-07 at 4 51 53 PM" src="https://user-images.githubusercontent.com/29489739/145111798-87747a21-673a-4293-95ea-83ba0babdb59.png">
 4. Click on "Build" on the top tool bar and click on "Rebuild Project". Look for "BUILD SUCCESSFUL" on the bottom log. <img width="892" alt="Screen Shot 2021-12-07 at 12 24 13 PM" src="https://user-images.githubusercontent.com/29489739/145076747-967543ba-2ae3-4aaa-adf7-eb63fb6a63b5.png">
 
 Problem solving: 
