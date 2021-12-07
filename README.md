@@ -71,5 +71,7 @@ In the initialization state, we can view the camera stream and adjust the camera
 #### 3a. Run the program
 Once you have placed the duck in one of the three possible regions that the robot camera is analyzing for a duck, making sure that telemetry correctly outputs the position the code thinks the duck is at, you can now run the program! Since we opened up the camera stream, we need to stop the program first by pressing the stop button and reinitialize but without opening the camera stream. Wait for the telemetry to output the correct position of the duck, and then hit the start button. The robot should drive to the duck! Feel free to play around with the different duck positions, but make sure to repeat the initialziation process in properly setting up the duck and robot. 
 
-
+## Project Video
+See our robot in action! 
+https://www.youtube.com/watch?v=CKBic0N2UCI 
 
