@@ -22,7 +22,6 @@ You can also refer to https://www.firstinspires.org/sites/default/files/uploads/
 * Robot!
 * Gamepad controller
 * Battery
-* Converter Cable 
 * Android Phone
 * Measuring Tape 
 * USB to USB C cable 
